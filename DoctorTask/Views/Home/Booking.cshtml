@@ -1,0 +1,60 @@
+﻿@model IEnumerable<DoctorTask.Entity.Doctor>
+
+<style>
+    .doctor-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    }
+
+    .doctor-card:hover {
+    transform: scale(1.02);
+    }
+
+    .doctor-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    }
+
+    .doctor-body {
+    padding: 16px;
+    }
+
+    .doctor-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+    }
+
+    .doctor-specialization {
+    color: #666;
+    }
+
+
+
+
+</style>
+
+
+
+
+    <div class="container my-5">
+        <h1 class="mb-5">Book an appointment</h1>
+        <div class="row">
+        @foreach (var doctor in Model)
+        {
+            <div class="col-4">
+                <div class="doctor-card">
+                    <img src="~/Images/@doctor.Img" class="img-fluid" style="height:400px;" />
+                    <div class="doctor-body">
+                        <p class="doctor-name">@doctor.Name</p>
+                        <p class="doctor-specialization">@doctor.Specialization</p>
+                    </div>
+                </div>
+            </div>
+        }
+        </div>
+    </div>
+
