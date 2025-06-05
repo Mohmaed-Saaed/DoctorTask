@@ -1,0 +1,124 @@
+﻿@model AppointmentUserMV;
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+@if (TempData["DateTaken"] != null)
+{
+    <div class="modal fade" id="dateTakenModal" tabindex="-1" aria-labelledby="dateTakenModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="dateTakenModalLabel">Notice</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <p><strong>@TempData["DateTaken"]</strong></p>
+
+                    @if (Model.AvailableDates != null && Model.AvailableDates.Count > 0)
+                    {
+                        <div class="mt-3">
+                            <h6>Available Time Slots:</h6>
+                            <ul class="list-group">
+                                @foreach (var date in Model.AvailableDates)
+                                {
+                                    <li class="list-group-item">@date.ToString("hh:mm tt")</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="container mt-5">
+    <div class="col-md-8 mx-auto">
+        <h2 class="text-primary fw-bold mb-4">
+            Complete Appointment with @Model.DoctorName
+        </h2>
+
+        <form asp-action="BookAppointment">
+            <input asp-for="DoctorName" type="hidden" value="@Model.DoctorName" />
+            <input asp-for="DateConfirmed" type="hidden" value="@Model.DateConfirmed" />
+            <input asp-for="DoctorId" type="hidden" value="@Model.DoctorId" />
+            <div class="mb-3">
+                <label for="patientName" class="form-label">Patient Name:</label>
+                <input asp-for="UserName" type="text" class="form-control" id="patientName" placeholder="Enter your name">
+                <span asp-validation-for="UserName" class="text-danger"></span>
+
+            </div>
+
+            <div class="mb-3">
+                <label for="appointmentDate" class="form-label">Appointment Date:</label>
+                <input asp-for="Date" type="text" id="appointmentDate" class="form-control" placeholder="Select a date">
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label for="appointmentTime" class="form-label">Appointment Time:</label>
+                <input asp-for="Time" type="text" id="appointmentTime" class="form-control" placeholder="Select a time">
+                <span asp-validation-for="Time" class="text-danger"></span>
+                <br />
+                <small class="text-muted">Appointments are only available from 10:00 AM to 5:00 PM, every 30 minutes.</small>
+            </div>
+                
+            @if(!@Model.DateConfirmed) {
+            <button type="submit" class="btn btn-primary">Complete Appointment</button>
+            }
+        </form>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script>
+    flatpickr("#appointmentDate", {
+      dateFormat: "Y-m-d",
+      disable: [
+        function (date) {
+          return (date.getDay() === 5 || date.getDay() === 6);
+        }
+      ]
+    });
+      flatpickr("#appointmentTime", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: false,
+        minTime: "10:00",
+        maxTime: "17:00",
+        minuteIncrement: 30
+    });
+            
+    if($('[name="DateConfirmed"]').val() === "True") {
+       toastr.success("Appointment date confirmed!", "Success");
+    }
+
+    $("#appointmentTime").on("change" ,function(){
+        var time = this.value.slice(3 ,5);
+        if(time != "00" || time != "30" ) {
+            this.value = `${this.value.slice(0 ,2)}:${time == "30" ? "30" : time == "00" ? "00" : "00"}`;
+        }
+    });
+
+
+    if ('@TempData["DateTaken"]' != null) {
+        $(document).ready(function () {
+            var myModal = new bootstrap.Modal(document.getElementById('dateTakenModal'));
+            myModal.show();
+        });
+    }
+     
+</script>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
